@@ -39,7 +39,5 @@ Proiectul este conceput pentru a rula în **Google Colab**:
 2.  Activați acceleratorul hardware: `Runtime -> Change runtime type -> T4 GPU`.
 3.  Rulați celulele în ordine (Configurare -> Testbench -> Benchmark-uri).
 
-## 👨‍💻 Autor
-**[Numele Tău]**
-*Proiect de Licență*
+
 
