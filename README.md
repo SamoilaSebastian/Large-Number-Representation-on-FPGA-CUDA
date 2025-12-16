@@ -13,9 +13,9 @@ Scopul este evidențierea momentului de "crossover" în care GPU-ul devine mai e
 ### 🧮 Algoritmi Implementați
 1.  **Operații de Bază:** Adunare și Scădere (propagare transport/borrow).
 2.  **Înmulțire Clasică (Schoolbook):**
-    * Implementare CPU ($O(N^2)$).
+    * Implementare CPU 
     * Implementare GPU folosind operații atomice (`cuda.atomic.add`).
-3.  **Algoritmul Karatsuba:** Implementare recursivă pe CPU ($O(N^{1.58})$) pentru comparație cu forța brută a GPU-ului.
+3.  **Algoritmul Karatsuba:** Implementare recursivă pe CPU pentru comparație cu forța brută a GPU-ului.
 4.  **Înmulțirea Montgomery:** Aritmetică modulară eficientă, esențială pentru criptografie (RSA).
 
 ### 📊 Testare și Validare
@@ -42,3 +42,4 @@ Proiectul este conceput pentru a rula în **Google Colab**:
 ## 👨‍💻 Autor
 **[Numele Tău]**
 *Proiect de Licență*
+
