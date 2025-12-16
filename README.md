@@ -1,165 +1,44 @@
-# Large-Number-Reprezentation-System
+# 🚀 Aritmetica Numerelor Mari: Analiză de Performanță CPU vs. GPU
 
-## 1. Introducere
+![Python](https://img.shields.io/badge/Python-3.x-blue?style=flat&logo=python)
+![CUDA](https://img.shields.io/badge/Numba-CUDA-green?style=flat&logo=nvidia)
 
-Aritmetica cu precizie arbitrară reprezintă o componentă esențială în domenii
-precum criptografia, simulările numerice de înaltă precizie și calculul științific.
-Operațiile pe numere foarte mari (peste 64 de biți) nu pot fi realizate eficient
-folosind doar instrucțiunile standard ale procesorului, motiv pentru care sunt
-necesare arhitecturi hardware dedicate.
+## 📖 Despre Proiect
+Acest proiect de licență analizează implementarea și optimizarea operațiilor aritmetice pe **numere mari (Arbitrary-Precision Arithmetic)** folosind arhitecturi paralele. Proiectul compară execuția secvențială pe CPU cu execuția masiv paralelizată pe GPU, utilizând biblioteca **Numba** pentru programare CUDA în Python.
 
-Acest proiect propune implementarea operațiilor aritmetice fundamentale
-(adunare, scădere și înmulțire) pentru numere mari, utilizând PyMTL – un
-Hardware Construction Language bazat pe Python – pentru a simula comportamentul
-unui accelerator FPGA, fără a necesita hardware fizic.
+Scopul este evidențierea momentului de "crossover" în care GPU-ul devine mai eficient decât CPU-ul și analiza impactului transferului de date prin PCIe.
 
----
+## ⚡ Funcționalități Principale
 
-## 2. Obiectivul proiectului
+### 🧮 Algoritmi Implementați
+1.  **Operații de Bază:** Adunare și Scădere (propagare transport/borrow).
+2.  **Înmulțire Clasică (Schoolbook):**
+    * Implementare CPU ($O(N^2)$).
+    * Implementare GPU folosind operații atomice (`cuda.atomic.add`).
+3.  **Algoritmul Karatsuba:** Implementare recursivă pe CPU ($O(N^{1.58})$) pentru comparație cu forța brută a GPU-ului.
+4.  **Înmulțirea Montgomery:** Aritmetică modulară eficientă, esențială pentru criptografie (RSA).
 
-Scopul proiectului este de a demonstra:
-- cum pot fi implementate operații aritmetice cu precizie mare folosind o
-  arhitectură hardware modulară;
-- cum se pot verifica aceste operații prin testbench-uri dedicate;
-- separarea clară dintre implementare hardware și verificare.
+### 📊 Testare și Validare
+* **Testbench Unificat:** Verificarea automată a corectitudinii matematice (Bit-exact).
+* **Precizie Variabilă:** Teste de scalabilitate de la 64 biți la 8192+ biți.
+* **Analiză Grafică:** Generarea automată a graficelor de performanță (Timp de execuție, Speedup, Analiză Latență vs. Calcul).
 
-Proiectul este realizat exclusiv prin simulare și se concentrează pe corectitudine
-funcțională, nu pe optimizare de performanță.
+## 🛠️ Tehnologii Utilizate
+* **Limbaj:** Python
+* **GPU Computing:** Numba (CUDA JIT)
+* **Structuri de date:** NumPy (Arrays uint64)
+* **Mediu de dezvoltare:** Google Colab (Tesla T4 GPU)
 
----
+## 📈 Concluzii
+* Pentru numere mici, latența transferului de date către GPU domină timpul de execuție, CPU-ul fiind mai rapid.
+* Pentru numere mari (peste 1024 biți), paralelismul GPU oferă un avantaj semnificativ, în special la operațiile cu complexitate pătratică (Înmulțire).
 
-## 3. Cerința proiectului (formulată clar)
+## 🚀 Rulare
+Proiectul este conceput pentru a rula în **Google Colab**:
+1.  Deschideți notebook-ul.
+2.  Activați acceleratorul hardware: `Runtime -> Change runtime type -> T4 GPU`.
+3.  Rulați celulele în ordine (Configurare -> Testbench -> Benchmark-uri).
 
-Se cere implementarea următoarelor componente:
-
-### 3.1 Operații de bază pe chunk
-- Adunare pe un chunk cu semnal de carry
-- Scădere pe un chunk cu semnal de borrow
-- Înmulțire pe un chunk
-
-Un *chunk* reprezintă o porțiune fixă a unui număr mare (de exemplu 32 biți).
-
-### 3.2 Operații pe numere mari
-- Reprezentarea numerelor mari ca vectori de chunk-uri
-- Implementarea adunării pe mai mulți chunk-uri
-- Implementarea înmulțirii pe mai mulți chunk-uri folosind metoda schoolbook
-
-Carry-ul și borrow-ul trebuie propagate corect între chunk-uri.
-
-### 3.3 Verificare
-- Crearea de testbench-uri pentru fiecare modul
-- Testarea corectitudinii pentru:
-  - cazuri normale
-  - cazuri limită (overflow, valori maxime, zero)
-- Compararea rezultatelor cu o implementare software de referință (Python)
-
----
-
-## 4. Tehnologii utilizate
-
-- **Python 3.10+**
-- **PyMTL3** – Hardware Construction Language
-- **pytest** – framework pentru testare automată
-
-Nu este utilizat hardware FPGA real.
-
----
-
-## 5. Structura proiectului
-
-.
-├── src/
-│ └── bigint_modules.py
-│ # Implementarea modulelor PyMTL:
-│ # - ChunkAdder
-│ # - ChunkSubtractor
-│ # - ChunkMultiplier
-│ # - BigIntAdder
-│ # - BigIntMultiplier
-│
-├── testbench/
-│ ├── test_chunk_adder.py
-│ ├── test_chunk_subtractor.py
-│ ├── test_chunk_multiplier.py
-│ ├── test_bigint_add.py
-│ └── test_bigint_mul.py
-│
-├── requirements.txt
-└── README.md
-
-yaml
-Copy code
-
----
-
-## 6. Descrierea implementării
-
-### 6.1 Reprezentarea numerelor mari
-Numerele mari sunt reprezentate ca liste de chunk-uri de dimensiune fixă.
-Fiecare chunk este procesat de un modul hardware dedicat.
-
-### 6.2 Module PyMTL
-- **ChunkAdder** – adună două chunk-uri și un carry de intrare
-- **ChunkSubtractor** – scade două chunk-uri cu borrow
-- **ChunkMultiplier** – realizează produsul a două chunk-uri
-- **BigIntAdder** – realizează adunarea pe mai mulți chunk-uri
-- **BigIntMultiplier** – realizează înmulțirea schoolbook
-
-Fiecare modul este descris folosind semantică hardware (semnale, actualizări
-sincrone).
-
----
-
-## 7. Verificare și testare
-
-Pentru fiecare modul există un testbench dedicat care:
-- instanțiază modulul PyMTL;
-- aplică vectori de test;
-- compară rezultatul cu o referință software Python.
-
-Testele sunt complet automate și pot fi rulate folosind `pytest`.
-
----
-
-## 8. Instalare
-
-```bash
-pip install pymtl3 pytest
-9. Rulare teste
-bash
-Copy code
-pytest testbench/
-Toate testele trebuie să fie marcate ca PASSED pentru ca implementarea să
-fie considerată corectă.
-
-10. Ce demonstrează acest proiect
-Utilizarea unui Hardware Construction Language (PyMTL)
-
-Implementarea logicii hardware pentru aritmetică cu precizie mare
-
-Propagarea corectă a carry-ului și borrow-ului
-
-Separarea implementării de verificare (design vs. testbench)
-
-Structurarea unui proiect HDL/HCL într-un repository GitHub
-
-11. Limitări
-Nu este utilizat un FPGA real
-
-Nu sunt implementați algoritmi avansați (Karatsuba, FFT)
-
-Accentul este pus pe corectitudine, nu pe performanță
-
-12. Posibile extensii
-Implementarea multiplicării Karatsuba
-
-Suport pentru aritmetică modulară (Montgomery)
-
-Generarea de cod HDL (Verilog) din PyMTL
-
-Analiză de performanță și resurse
-
-13. Concluzie
-Acest proiect oferă o implementare clară, modulară și verificată a aritmeticii
-cu precizie arbitrară folosind PyMTL. Structura și documentația sunt concepute
-pentru a respecta cerințele academice ale fazei de implementare HDL/HCL
+## 👨‍💻 Autor
+**[Numele Tău]**
+*Proiect de Licență*
